@@ -7,15 +7,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
-  <!-- Tiptap via CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/core@2.4.0/dist/index.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/pm@2.4.0/dist/index.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/starter-kit@2.4.0/dist/index.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-image@2.4.0/dist/index.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-link@2.4.0/dist/index.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-placeholder@2.4.0/dist/index.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-color@2.4.0/dist/index.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-style@2.4.0/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prosemirror-model@1.19.0/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prosemirror-state@1.4.3/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prosemirror-view@1.31.7/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prosemirror-transform@1.7.3/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prosemirror-commands@1.5.2/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prosemirror-keymap@1.2.2/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prosemirror-history@1.3.2/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prosemirror-schema-basic@1.2.2/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prosemirror-schema-list@1.3.0/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prosemirror-inputrules@1.2.1/dist/index.js"></script>
   <style>
     :root {
       --bg: #f8f6f2; --card: #ffffff; --muted: #f0ece5; --border: #e4dbd0;
@@ -29,21 +31,16 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; }
-
-    /* NAV */
     nav { background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
     .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 1.25rem; height: 52px; display: flex; align-items: center; justify-content: space-between; }
     .logo { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
     .nav-right { display: flex; gap: .5rem; align-items: center; }
     .btn { border: none; border-radius: 8px; padding: 6px 14px; font-size: .82rem; font-weight: 600; cursor: pointer; font-family: 'Sora', sans-serif; }
     .btn-outline { background: var(--card); border: 1px solid var(--border); color: var(--text-sec); }
-    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
     .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { opacity: .9; }
     .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
     .btn-theme { background: var(--muted); border: none; border-radius: 8px; padding: 4px 10px; cursor: pointer; font-size: .85rem; color: var(--text-mut); }
 
-    /* AUTH SCREEN */
     #authScreen { max-width: 360px; margin: 5rem auto; padding: 2rem; background: var(--card); border: 1px solid var(--border); border-radius: 16px; }
     #authScreen h2 { font-family: 'Lora', serif; font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 1.25rem; text-align: center; }
     .field { margin-bottom: .75rem; }
@@ -56,16 +53,12 @@
     .auth-error { background: #fef2f2; color: #dc2626; padding: .6rem .9rem; border-radius: 8px; font-size: .82rem; margin-bottom: .75rem; }
     .auth-success { background: #f0fdf4; color: #16a34a; padding: .6rem .9rem; border-radius: 8px; font-size: .82rem; margin-bottom: .75rem; }
 
-    /* ADMIN PANEL */
     #adminPanel { display: none; }
     .main-layout { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
-
-    /* TABS */
     .tabs { display: flex; gap: .4rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: .75rem; }
     .tab { background: none; border: none; padding: 6px 14px; font-size: .85rem; font-weight: 600; cursor: pointer; border-radius: 8px; color: var(--text-mut); font-family: 'Sora', sans-serif; }
     .tab.active { background: var(--accent-muted); color: var(--accent); }
 
-    /* POSTS LIST TAB */
     .post-row { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: .9rem 1.1rem; display: flex; align-items: center; gap: 1rem; margin-bottom: .6rem; }
     .post-row-info { flex: 1; min-width: 0; }
     .post-row-title { font-weight: 600; font-size: .9rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -78,30 +71,25 @@
     .row-btn:hover { background: var(--accent-muted); color: var(--accent); }
     .row-btn.danger:hover { background: #fef2f2; color: #dc2626; }
 
-    /* EDITOR LAYOUT */
     .editor-layout { display: grid; grid-template-columns: 1fr 260px; gap: 1.5rem; }
     @media (max-width: 700px) { .editor-layout { grid-template-columns: 1fr; } }
     .editor-main { min-width: 0; }
 
-    /* TITLE/EXCERPT */
     #postTitle { width: 100%; font-family: 'Lora', serif; font-size: 1.75rem; font-weight: 700; background: transparent; border: none; outline: none; color: var(--text); padding: .25rem 0; margin-bottom: .5rem; }
     #postExcerpt { width: 100%; font-size: .95rem; background: transparent; border: none; outline: none; color: var(--text-sec); resize: none; font-family: 'Sora', sans-serif; margin-bottom: 1rem; }
 
-    /* TIPTAP TOOLBAR */
     .toolbar { background: var(--muted); border: 1px solid var(--border); border-radius: 10px 10px 0 0; padding: .4rem .6rem; display: flex; flex-wrap: wrap; gap: 2px; align-items: center; }
-    .tb-btn { background: none; border: none; border-radius: 6px; width: 30px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-mut); font-size: .82rem; font-weight: 700; font-family: 'Sora', sans-serif; transition: all .1s; }
+    .tb-btn { background: none; border: none; border-radius: 6px; width: 30px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-mut); font-size: .82rem; font-weight: 700; font-family: 'Sora', sans-serif; }
     .tb-btn:hover { background: var(--card); color: var(--text); }
     .tb-btn.active { background: var(--accent-muted); color: var(--accent); }
     .tb-sep { width: 1px; height: 20px; background: var(--border); margin: 0 3px; }
-    .color-row { display: flex; gap: 4px; align-items: center; padding: 0 2px; }
-    .color-dot { width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: border-color .15s; }
-    .color-dot:hover { border-color: var(--text-mut); }
-    .color-dot.selected { border-color: var(--text); }
+    .color-dot { width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; display: inline-block; }
+    .color-dot:hover, .color-dot.selected { border-color: var(--text); }
 
-    /* TIPTAP EDITOR */
-    .editor-wrap { background: var(--card); border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; padding: 1.25rem; min-height: 400px; }
+    .editor-wrap { background: var(--card); border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; padding: 1.25rem; min-height: 400px; cursor: text; }
     .ProseMirror { outline: none; min-height: 360px; font-family: 'Lora', serif; font-size: 1.05rem; line-height: 1.85; color: var(--text-sec); }
     .ProseMirror p { margin-bottom: 1rem; }
+    .ProseMirror h1 { font-size: 1.6rem; font-weight: 700; color: var(--text); margin: 1.75rem 0 .6rem; }
     .ProseMirror h2 { font-size: 1.35rem; font-weight: 700; color: var(--text); margin: 1.75rem 0 .6rem; }
     .ProseMirror h3 { font-size: 1.1rem; font-weight: 600; color: var(--text); margin: 1.25rem 0 .4rem; }
     .ProseMirror blockquote { border-left: 3px solid var(--accent); padding-left: 1.1rem; margin: 1.25rem 0; font-style: italic; }
@@ -110,34 +98,27 @@
     .ProseMirror pre code { background: none; color: #e2e8f0; font-size: .88rem; }
     .ProseMirror img { max-width: 100%; border-radius: 10px; margin: 1rem auto; display: block; }
     .ProseMirror ul, .ProseMirror ol { padding-left: 1.4rem; margin-bottom: 1rem; }
-    .ProseMirror p.is-editor-empty:first-child::before { content: attr(data-placeholder); float: left; color: var(--text-mut); pointer-events: none; height: 0; }
+    .ProseMirror li { margin-bottom: .25rem; }
     .ProseMirror a { color: var(--accent); text-decoration: underline; }
+    .ProseMirror.ProseMirror-focused { outline: none; }
+    .ProseMirror p.is-empty:first-child::before { content: 'Yazınızı buraya yazın... Formül için $...$ kullanın.'; color: var(--text-mut); pointer-events: none; float: left; height: 0; }
 
-    /* SIDEBAR */
     .sidebar { display: flex; flex-direction: column; gap: .75rem; }
     .side-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
     .side-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-mut); margin-bottom: .5rem; display: block; }
-    .side-card select, .side-card input[type=text], .side-card input[type=url], .side-card input[type=number] {
-      width: 100%; background: var(--muted); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: .85rem; color: var(--text); outline: none; font-family: 'Sora', sans-serif;
-    }
+    .side-card select, .side-card input[type=text], .side-card input[type=url], .side-card input[type=number] { width: 100%; background: var(--muted); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: .85rem; color: var(--text); outline: none; font-family: 'Sora', sans-serif; }
     .side-card select:focus, .side-card input:focus { border-color: var(--accent); }
     .tag-input-row { display: flex; gap: .4rem; margin-top: .4rem; }
     .tag-input-row input { flex: 1; }
     .tag-add-btn { background: var(--accent-muted); border: none; border-radius: 7px; padding: 5px 10px; font-size: .8rem; color: var(--accent); cursor: pointer; }
     .tags-wrap { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .5rem; }
     .tag-chip { background: var(--muted); color: var(--text-sec); font-size: .72rem; padding: 2px 9px; border-radius: 999px; cursor: pointer; }
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; }
-    .toggle-row span { font-size: .85rem; color: var(--text-sec); }
     .toggle { width: 38px; height: 20px; border-radius: 999px; border: none; cursor: pointer; position: relative; transition: background .2s; }
     .toggle-knob { position: absolute; top: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: left .2s; box-shadow: 0 1px 3px #0003; }
-
-    /* COVER PREVIEW */
     #coverPreview { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-top: .5rem; display: none; }
 
-    /* NOTIFICATION */
     .notif { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--text); color: var(--bg); padding: .75rem 1.25rem; border-radius: 10px; font-size: .85rem; font-weight: 600; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 999; }
     .notif.show { opacity: 1; }
-
     .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
@@ -154,29 +135,16 @@
   </div>
 </nav>
 
-<!-- AUTH SCREEN -->
 <div id="authScreen">
   <h2>Giriş Yap</h2>
   <div id="authMsg"></div>
-  <div class="field">
-    <label>E-posta</label>
-    <input type="email" id="authEmail" placeholder="ornek@mail.com" />
-  </div>
-  <div class="field" id="nameField" style="display:none">
-    <label>Ad Soyad</label>
-    <input type="text" id="authName" placeholder="Ad Soyad" />
-  </div>
-  <div class="field">
-    <label>Şifre</label>
-    <input type="password" id="authPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()" />
-  </div>
+  <div class="field"><label>E-posta</label><input type="email" id="authEmail" placeholder="ornek@mail.com" /></div>
+  <div class="field" id="nameField" style="display:none"><label>Ad Soyad</label><input type="text" id="authName" placeholder="Ad Soyad" /></div>
+  <div class="field"><label>Şifre</label><input type="password" id="authPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()" /></div>
   <button class="auth-btn" onclick="doAuth()" id="authBtn">Giriş Yap</button>
-  <div class="auth-toggle">
-    <span onclick="toggleAuthMode()" id="authToggle">Hesabın yok mu? Kayıt Ol</span>
-  </div>
+  <div class="auth-toggle"><span onclick="toggleAuthMode()" id="authToggle">Hesabın yok mu? Kayıt Ol</span></div>
 </div>
 
-<!-- ADMIN PANEL -->
 <div id="adminPanel">
   <div class="main-layout">
     <div class="tabs">
@@ -184,13 +152,12 @@
       <button class="tab" onclick="showTab('list')" id="tabList">📋 Yazılarım</button>
     </div>
 
-    <!-- EDITOR TAB -->
     <div id="editorTab">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
         <span style="font-size:.82rem;color:var(--text-mut)" id="editingLabel"></span>
         <div style="display:flex;gap:.5rem">
-          <button class="btn btn-outline" onclick="saveDraft()" id="btnDraft">Taslak Kaydet</button>
-          <button class="btn btn-primary" onclick="publish()" id="btnPublish">Yayınla</button>
+          <button class="btn btn-outline" onclick="savePost('draft')">Taslak Kaydet</button>
+          <button class="btn btn-primary" onclick="savePost('published')" id="btnPublish">Yayınla</button>
         </div>
       </div>
 
@@ -199,39 +166,35 @@
           <input id="postTitle" placeholder="Yazı başlığı..." />
           <textarea id="postExcerpt" rows="2" placeholder="Kısa özet (opsiyonel)..."></textarea>
 
-          <!-- Toolbar -->
-          <div class="toolbar" id="toolbar">
-            <button class="tb-btn" title="Kalın" onclick="cmd('toggleBold')"><b>B</b></button>
-            <button class="tb-btn" title="İtalik" onclick="cmd('toggleItalic')"><i>I</i></button>
-            <button class="tb-btn" title="Üstü çizili" onclick="cmd('toggleStrike')"><s>S</s></button>
-            <button class="tb-btn" title="Kod" onclick="cmd('toggleCode')">&#x7B;&#x7D;</button>
+          <div class="toolbar">
+            <button class="tb-btn" id="btn-bold" onclick="editorCmd('bold')" title="Kalın"><b>B</b></button>
+            <button class="tb-btn" id="btn-italic" onclick="editorCmd('italic')" title="İtalik"><i>I</i></button>
+            <button class="tb-btn" id="btn-strike" onclick="editorCmd('strike')" title="Üstü çizili"><s>S</s></button>
             <div class="tb-sep"></div>
-            <button class="tb-btn" title="Başlık 2" onclick="cmd('toggleHeading',{level:2})">H2</button>
-            <button class="tb-btn" title="Başlık 3" onclick="cmd('toggleHeading',{level:3})">H3</button>
-            <button class="tb-btn" title="Alıntı" onclick="cmd('toggleBlockquote')">❝</button>
+            <button class="tb-btn" id="btn-h2" onclick="editorCmd('h2')" title="Başlık 2">H2</button>
+            <button class="tb-btn" id="btn-h3" onclick="editorCmd('h3')" title="Başlık 3">H3</button>
+            <button class="tb-btn" id="btn-quote" onclick="editorCmd('blockquote')" title="Alıntı">❝</button>
             <div class="tb-sep"></div>
-            <button class="tb-btn" title="Madde listesi" onclick="cmd('toggleBulletList')">•≡</button>
-            <button class="tb-btn" title="Numaralı liste" onclick="cmd('toggleOrderedList')">1≡</button>
-            <button class="tb-btn" title="Kod bloğu" onclick="cmd('toggleCodeBlock')">&lt;/&gt;</button>
+            <button class="tb-btn" id="btn-ul" onclick="editorCmd('ul')" title="Liste">•≡</button>
+            <button class="tb-btn" id="btn-ol" onclick="editorCmd('ol')" title="Numaralı">1≡</button>
+            <button class="tb-btn" id="btn-code" onclick="editorCmd('code')" title="Kod bloğu">&lt;/&gt;</button>
             <div class="tb-sep"></div>
-            <button class="tb-btn" title="Bağlantı" onclick="insertLink()">🔗</button>
-            <button class="tb-btn" title="Resim URL" onclick="insertImageUrl()">🖼</button>
-            <button class="tb-btn" title="Resim yükle" onclick="document.getElementById('imgUpload').click()">⬆</button>
-            <button class="tb-btn" title="Yatay çizgi" onclick="cmd('setHorizontalRule')">—</button>
+            <button class="tb-btn" onclick="insertLink()" title="Bağlantı">🔗</button>
+            <button class="tb-btn" onclick="insertImageUrl()" title="Resim URL">🖼</button>
+            <button class="tb-btn" onclick="document.getElementById('imgUpload').click()" title="Resim yükle">⬆</button>
             <div class="tb-sep"></div>
-            <button class="tb-btn" title="Satır içi LaTeX ($...$)" onclick="insertMath(false)" style="font-family:'JetBrains Mono',monospace;font-size:.75rem">$</button>
-            <button class="tb-btn" title="Blok LaTeX ($$...$$)" onclick="insertMath(true)" style="font-size:.9rem">Σ</button>
+            <button class="tb-btn" onclick="insertMath(false)" title="Satır içi formül" style="font-family:monospace">$</button>
+            <button class="tb-btn" onclick="insertMath(true)" title="Blok formül">Σ</button>
             <div class="tb-sep"></div>
-            <div class="color-row" id="colorRow"></div>
+            <div id="colorRow" style="display:flex;gap:3px;align-items:center"></div>
           </div>
 
-          <div class="editor-wrap">
+          <div class="editor-wrap" id="editorWrap">
             <div id="editor"></div>
           </div>
           <input type="file" id="imgUpload" accept="image/*" style="display:none" onchange="uploadImage(this)" />
         </div>
 
-        <!-- SIDEBAR -->
         <div class="sidebar">
           <div class="side-card">
             <span class="side-label">Kategori</span>
@@ -244,13 +207,11 @@
               <option value="diger">Diğer</option>
             </select>
           </div>
-
           <div class="side-card">
             <span class="side-label">Kapak Görseli URL</span>
             <input type="url" id="coverUrl" placeholder="https://..." oninput="previewCover(this.value)" />
             <img id="coverPreview" alt="Kapak" />
           </div>
-
           <div class="side-card">
             <span class="side-label">Etiketler</span>
             <div class="tag-input-row">
@@ -259,11 +220,10 @@
             </div>
             <div class="tags-wrap" id="tagsWrap"></div>
           </div>
-
           <div class="side-card">
             <span class="side-label">Ayarlar</span>
-            <div class="toggle-row" style="margin-bottom:.75rem">
-              <span>Öne çıkar</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+              <span style="font-size:.85rem;color:var(--text-sec)">Öne çıkar</span>
               <button class="toggle" id="featuredToggle" onclick="toggleFeatured()" style="background:var(--border)">
                 <span class="toggle-knob" style="left:2px"></span>
               </button>
@@ -273,15 +233,13 @@
               <input type="number" id="readTime" value="5" min="1" max="60" style="width:60px;text-align:center" />
             </div>
           </div>
-
           <button class="btn btn-outline" onclick="clearEditor()" style="font-size:.8rem">🗑 Temizle</button>
         </div>
       </div>
     </div>
 
-    <!-- LIST TAB -->
     <div id="listTab" style="display:none">
-      <div id="postRows"><div class="spinner" style="margin:2rem auto"></div></div>
+      <div id="postRows"></div>
     </div>
   </div>
 </div>
@@ -289,350 +247,356 @@
 <div class="notif" id="notif"></div>
 
 <script>
-    let authMode = 'login'
-  const SUPABASE_URL = 'https://umuiojigaasxaanxbiil.supabase.co'
-  const SUPABASE_ANON_KEY = 'sb_publishable_1TLYJD-tBtAFjPw9l6EktQ_XqQ42TzV'
-  const ADMIN_USER_ID = '9cc50286-6229-4b2b-a3e6-883a812f2390'
+// ── CONFIG ──────────────────────────────────────────
+const SUPABASE_URL = 'YOUR_SUPABASE_URL'
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'
+const ADMIN_USER_ID = 'YOUR_ADMIN_USER_ID'
+// ────────────────────────────────────────────────────
 
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  let editor = null
-  let currentUser = null
-  let tags = []
-  let featured = false
-  let editingId = null
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+let currentUser = null
+let tags = []
+let featured = false
+let editingId = null
+let authMode = 'login'
+let editorEl = null
+let currentColor = null
 
+const COLORS = ['#1c1a17','#2b57e0','#dc2626','#16a34a','#f59e0b','#8b5cf6','#06b6d4','#db2777']
 
-  const COLORS = ['#1c1a17','#2b57e0','#dc2626','#16a34a','#f59e0b','#8b5cf6','#06b6d4','#db2777']
+// Theme
+if (localStorage.getItem('theme') === 'dark') {
+  document.documentElement.classList.add('dark')
+  document.getElementById('themeBtn').textContent = '☀️'
+}
+function toggleTheme() {
+  const dark = document.documentElement.classList.toggle('dark')
+  localStorage.setItem('theme', dark ? 'dark' : 'light')
+  document.getElementById('themeBtn').textContent = dark ? '☀️' : '🌙'
+}
 
-  // Theme
-  const saved = localStorage.getItem('theme')
-  if (saved === 'dark') { document.documentElement.classList.add('dark'); document.getElementById('themeBtn').textContent = '☀️' }
-  function toggleTheme() {
-    const dark = document.documentElement.classList.toggle('dark')
-    localStorage.setItem('theme', dark ? 'dark' : 'light')
-    document.getElementById('themeBtn').textContent = dark ? '☀️' : '🌙'
-  }
+// ── AUTH ────────────────────────────────────────────
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'register' : 'login'
+  document.getElementById('authBtn').textContent = authMode === 'login' ? 'Giriş Yap' : 'Kayıt Ol'
+  document.getElementById('authToggle').textContent = authMode === 'login' ? 'Hesabın yok mu? Kayıt Ol' : 'Zaten hesabın var mı? Giriş Yap'
+  document.getElementById('nameField').style.display = authMode === 'register' ? 'block' : 'none'
+  document.getElementById('authMsg').innerHTML = ''
+}
 
-  // ── AUTH ────────────────────────────────────────────────
-  function toggleAuthMode() {
-    authMode = authMode === 'login' ? 'register' : 'login'
-    document.getElementById('authBtn').textContent = authMode === 'login' ? 'Giriş Yap' : 'Kayıt Ol'
-    document.getElementById('authToggle').textContent = authMode === 'login' ? 'Hesabın yok mu? Kayıt Ol' : 'Zaten hesabın var mı? Giriş Yap'
-    document.getElementById('nameField').style.display = authMode === 'register' ? 'block' : 'none'
-    document.getElementById('authMsg').innerHTML = ''
-  }
-
-  async function doAuth() {
-    const email = document.getElementById('authEmail').value.trim()
-    const password = document.getElementById('authPassword').value
-    const name = document.getElementById('authName').value.trim()
-    if (!email || !password) return
-    document.getElementById('authBtn').textContent = '...'
-    try {
-      if (authMode === 'login') {
-        const { error } = await sb.auth.signInWithPassword({ email, password })
-        if (error) throw error
-      } else {
-        const { error } = await sb.auth.signUp({ email, password, options: { data: { full_name: name } } })
-        if (error) throw error
-        document.getElementById('authMsg').innerHTML = '<div class="auth-success">Hesap oluşturuldu! E-postanızı doğrulayın.</div>'
-        document.getElementById('authBtn').textContent = authMode === 'login' ? 'Giriş Yap' : 'Kayıt Ol'
-        return
-      }
-    } catch(e) {
-      document.getElementById('authMsg').innerHTML = `<div class="auth-error">${e.message}</div>`
-      document.getElementById('authBtn').textContent = authMode === 'login' ? 'Giriş Yap' : 'Kayıt Ol'
+async function doAuth() {
+  const email = document.getElementById('authEmail').value.trim()
+  const password = document.getElementById('authPassword').value
+  const name = document.getElementById('authName').value.trim()
+  if (!email || !password) return
+  document.getElementById('authBtn').textContent = '...'
+  try {
+    if (authMode === 'login') {
+      const { error } = await sb.auth.signInWithPassword({ email, password })
+      if (error) throw error
+    } else {
+      const { error } = await sb.auth.signUp({ email, password, options: { data: { full_name: name } } })
+      if (error) throw error
+      document.getElementById('authMsg').innerHTML = '<div class="auth-success">Hesap oluşturuldu! E-postanızı doğrulayın.</div>'
+      document.getElementById('authBtn').textContent = 'Kayıt Ol'
       return
     }
+  } catch(e) {
+    document.getElementById('authMsg').innerHTML = `<div class="auth-error">${e.message}</div>`
+    document.getElementById('authBtn').textContent = authMode === 'login' ? 'Giriş Yap' : 'Kayıt Ol'
   }
+}
 
-  sb.auth.onAuthStateChange((_e, session) => {
-    currentUser = session?.user || null
-    if (currentUser) {
-      document.getElementById('authScreen').style.display = 'none'
-      document.getElementById('adminPanel').style.display = 'block'
-      document.getElementById('userInfo').textContent = currentUser.email?.split('@')[0]
-      initEditor()
-      checkEditParam()
-    } else {
-      document.getElementById('authScreen').style.display = 'block'
-      document.getElementById('adminPanel').style.display = 'none'
+sb.auth.onAuthStateChange((_e, session) => {
+  currentUser = session?.user || null
+  if (currentUser) {
+    document.getElementById('authScreen').style.display = 'none'
+    document.getElementById('adminPanel').style.display = 'block'
+    document.getElementById('userInfo').textContent = currentUser.email?.split('@')[0]
+    initEditor()
+    checkEditParam()
+  } else {
+    document.getElementById('authScreen').style.display = 'block'
+    document.getElementById('adminPanel').style.display = 'none'
+  }
+})
+
+// ── SIMPLE RICH EDITOR (contenteditable) ────────────
+function initEditor() {
+  if (editorEl) return
+  const wrap = document.getElementById('editor')
+  wrap.contentEditable = 'true'
+  wrap.className = 'ProseMirror'
+  wrap.style.minHeight = '360px'
+  wrap.style.outline = 'none'
+  editorEl = wrap
+
+  // Click on wrap focuses editor
+  document.getElementById('editorWrap').addEventListener('click', () => wrap.focus())
+
+  // Color buttons
+  const colorRow = document.getElementById('colorRow')
+  COLORS.forEach(c => {
+    const d = document.createElement('span')
+    d.className = 'color-dot'
+    d.style.background = c
+    d.title = c
+    d.onclick = (e) => {
+      e.preventDefault()
+      currentColor = c
+      document.execCommand('foreColor', false, c)
+      document.querySelectorAll('.color-dot').forEach(x => x.classList.remove('selected'))
+      d.classList.add('selected')
     }
+    colorRow.appendChild(d)
   })
 
-  // ── EDITOR ──────────────────────────────────────────────
-  function initEditor() {
-    if (editor) return
+  wrap.addEventListener('keyup', updateToolbarState)
+  wrap.addEventListener('mouseup', updateToolbarState)
+  wrap.addEventListener('input', updateToolbarState)
+}
 
-const { Editor } = Tiptap.Core
-const StarterKit = TiptapStarterKit.StarterKit
-const Image = TiptapImage.Image
-const Link = TiptapLink.Link
-const Placeholder = TiptapPlaceholder.Placeholder
-const Color = TiptapColor.Color
-const TextStyle = TiptapTextStyle.TextStyle
-
-    editor = new Editor({
-      element: document.getElementById('editor'),
-      extensions: [
-        StarterKit,
-        Image.configure({ allowBase64: true }),
-        Link.configure({ openOnClick: false }),
-        TextStyle,
-        Color,
-        Placeholder.configure({ placeholder: 'Yazınızı buraya yazın... Formül için $...$ veya $$...$$ kullanın.' }),
-      ],
-      onUpdate: () => updateToolbar(),
-      onSelectionUpdate: () => updateToolbar(),
-    })
-
-    // Color buttons
-    const colorRow = document.getElementById('colorRow')
-    COLORS.forEach(c => {
-      const d = document.createElement('span')
-      d.className = 'color-dot'
-      d.style.background = c
-      d.title = c
-      d.onclick = () => { editor.chain().focus().setColor(c).run(); updateToolbar() }
-      colorRow.appendChild(d)
-    })
-  }
-
-  function cmd(name, args) {
-    if (!editor) return
-    editor.chain().focus()[name](args).run()
-    updateToolbar()
-  }
-
-  function updateToolbar() {
-    if (!editor) return
-    const map = {
-      'bold': 'toggleBold', 'italic': 'toggleItalic', 'strike': 'toggleStrike',
-      'code': 'toggleCode', 'blockquote': 'toggleBlockquote',
-      'bulletList': 'toggleBulletList', 'orderedList': 'toggleOrderedList', 'codeBlock': 'toggleCodeBlock',
-    }
-    document.querySelectorAll('.tb-btn').forEach(btn => {
-      const cmd = btn.getAttribute('onclick')
-      if (!cmd) return
-      const match = cmd.match(/cmd\('(\w+)'/)
-      if (match) {
-        const active = editor.isActive(Object.keys(map).find(k => map[k] === match[1]) || match[1])
-        btn.classList.toggle('active', !!active)
+function editorCmd(cmd) {
+  const wrap = document.getElementById('editor')
+  wrap.focus()
+  switch(cmd) {
+    case 'bold': document.execCommand('bold'); break
+    case 'italic': document.execCommand('italic'); break
+    case 'strike': document.execCommand('strikeThrough'); break
+    case 'h2': document.execCommand('formatBlock', false, 'h2'); break
+    case 'h3': document.execCommand('formatBlock', false, 'h3'); break
+    case 'blockquote': document.execCommand('formatBlock', false, 'blockquote'); break
+    case 'ul': document.execCommand('insertUnorderedList'); break
+    case 'ol': document.execCommand('insertOrderedList'); break
+    case 'code':
+      const sel = window.getSelection()
+      if (sel.rangeCount) {
+        const range = sel.getRangeAt(0)
+        const code = document.createElement('code')
+        code.style.background = 'var(--muted)'
+        code.style.padding = '.15em .4em'
+        code.style.borderRadius = '4px'
+        code.style.fontFamily = 'JetBrains Mono, monospace'
+        range.surroundContents(code)
       }
-    })
-    // heading
-    document.querySelectorAll('.tb-btn').forEach(btn => {
-      if (btn.textContent === 'H2') btn.classList.toggle('active', editor.isActive('heading', { level: 2 }))
-      if (btn.textContent === 'H3') btn.classList.toggle('active', editor.isActive('heading', { level: 3 }))
-    })
-    // colors
-    const currentColor = editor.getAttributes('textStyle').color
-    document.querySelectorAll('.color-dot').forEach(d => {
-      d.classList.toggle('selected', d.style.background === currentColor)
-    })
+      break
+  }
+  updateToolbarState()
+}
+
+function updateToolbarState() {
+  document.getElementById('btn-bold').classList.toggle('active', document.queryCommandState('bold'))
+  document.getElementById('btn-italic').classList.toggle('active', document.queryCommandState('italic'))
+  document.getElementById('btn-strike').classList.toggle('active', document.queryCommandState('strikeThrough'))
+  document.getElementById('btn-ul').classList.toggle('active', document.queryCommandState('insertUnorderedList'))
+  document.getElementById('btn-ol').classList.toggle('active', document.queryCommandState('insertOrderedList'))
+}
+
+function insertLink() {
+  const url = prompt('URL girin:')
+  if (url) { document.getElementById('editor').focus(); document.execCommand('createLink', false, url) }
+}
+
+function insertImageUrl() {
+  const url = prompt('Resim URL girin:')
+  if (!url) return
+  document.getElementById('editor').focus()
+  document.execCommand('insertHTML', false, `<img src="${url}" style="max-width:100%;border-radius:10px;margin:1rem auto;display:block" />`)
+}
+
+async function uploadImage(input) {
+  const file = input.files[0]
+  if (!file || !currentUser) return
+  notify('Yükleniyor...')
+  const ext = file.name.split('.').pop()
+  const path = `${currentUser.id}/${Date.now()}.${ext}`
+  const { data, error } = await sb.storage.from('blog-images').upload(path, file, { upsert: true })
+  if (error) { notify('Yükleme başarısız: ' + error.message); return }
+  const { data: { publicUrl } } = sb.storage.from('blog-images').getPublicUrl(data.path)
+  document.getElementById('editor').focus()
+  document.execCommand('insertHTML', false, `<img src="${publicUrl}" style="max-width:100%;border-radius:10px;margin:1rem auto;display:block" />`)
+  notify('Resim eklendi ✓')
+  input.value = ''
+}
+
+function insertMath(display) {
+  const latex = prompt(display ? 'Blok LaTeX formülü girin:' : 'Satır içi LaTeX formülü girin:')
+  if (!latex) return
+  const text = display ? `$$${latex}$$` : `$${latex}$`
+  document.getElementById('editor').focus()
+  document.execCommand('insertText', false, text)
+}
+
+function getEditorHTML() {
+  return document.getElementById('editor').innerHTML
+}
+
+function setEditorHTML(html) {
+  document.getElementById('editor').innerHTML = html
+}
+
+// ── TAGS ────────────────────────────────────────────
+function addTag() {
+  const val = document.getElementById('tagInput').value.trim().toLowerCase()
+  if (!val || tags.includes(val)) { document.getElementById('tagInput').value = ''; return }
+  tags.push(val)
+  document.getElementById('tagInput').value = ''
+  renderTags()
+}
+function removeTag(t) { tags = tags.filter(x => x !== t); renderTags() }
+function renderTags() {
+  document.getElementById('tagsWrap').innerHTML = tags.map(t =>
+    `<span class="tag-chip" onclick="removeTag('${t}')">${t} ×</span>`
+  ).join('')
+}
+
+// ── FEATURED ────────────────────────────────────────
+function toggleFeatured() {
+  featured = !featured
+  const btn = document.getElementById('featuredToggle')
+  btn.style.background = featured ? 'var(--accent)' : 'var(--border)'
+  btn.querySelector('.toggle-knob').style.left = featured ? '20px' : '2px'
+}
+function setFeaturedState(val) {
+  featured = val
+  const btn = document.getElementById('featuredToggle')
+  btn.style.background = val ? 'var(--accent)' : 'var(--border)'
+  btn.querySelector('.toggle-knob').style.left = val ? '20px' : '2px'
+}
+
+function previewCover(url) {
+  const img = document.getElementById('coverPreview')
+  if (url) { img.src = url; img.style.display = 'block' }
+  else { img.style.display = 'none' }
+}
+
+// ── SAVE ────────────────────────────────────────────
+async function savePost(status) {
+  if (!currentUser) return
+  const title = document.getElementById('postTitle').value.trim()
+  if (!title) { notify('Başlık gerekli!'); return }
+
+  const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + Date.now()
+  const content = getEditorHTML()
+  const excerpt = document.getElementById('postExcerpt').value.trim()
+  const category = document.getElementById('postCategory').value
+  const cover_image = document.getElementById('coverUrl').value.trim()
+  const read_time = parseInt(document.getElementById('readTime').value) || 5
+
+  const payload = {
+    title,
+    excerpt: excerpt || null,
+    content,
+    category: category || null,
+    cover_image: cover_image || null,
+    tags,
+    featured,
+    read_time,
+    status,
+    author_id: currentUser.id,
+    published_at: status === 'published' ? new Date().toISOString() : null,
   }
 
-  function insertLink() {
-    const url = prompt('URL girin:')
-    if (url) editor.chain().focus().setLink({ href: url }).run()
+  let error
+  if (editingId) {
+    ;({ error } = await sb.from('posts').update(payload).eq('id', editingId))
+  } else {
+    payload.slug = slug
+    ;({ error } = await sb.from('posts').insert(payload))
   }
 
-  function insertImageUrl() {
-    const url = prompt('Resim URL girin:')
-    if (url) editor.chain().focus().setImage({ src: url }).run()
-  }
+  if (error) { notify('Hata: ' + error.message); return }
+  notify(status === 'published' ? 'Yayınlandı ✓' : 'Taslak kaydedildi ✓')
+  setTimeout(() => window.location.href = 'index.html', 1000)
+}
 
-  async function uploadImage(input) {
-    const file = input.files[0]
-    if (!file || !currentUser) return
-    notify('Yükleniyor...')
-    const ext = file.name.split('.').pop()
-    const path = `${currentUser.id}/${Date.now()}.${ext}`
-    const { data, error } = await sb.storage.from('blog-images').upload(path, file, { upsert: true })
-    if (error) { notify('Yükleme başarısız'); return }
-    const { data: { publicUrl } } = sb.storage.from('blog-images').getPublicUrl(data.path)
-    editor.chain().focus().setImage({ src: publicUrl }).run()
-    notify('Resim eklendi ✓')
-    input.value = ''
-  }
+// ── EDIT PARAM ──────────────────────────────────────
+async function checkEditParam() {
+  const editId = new URLSearchParams(location.search).get('edit')
+  if (!editId) return
+  editingId = editId
+  document.getElementById('editingLabel').textContent = 'Yazı düzenleniyor'
+  document.getElementById('btnPublish').textContent = 'Güncelle'
+  const { data: post } = await sb.from('posts').select('*').eq('id', editId).single()
+  if (!post) return
+  document.getElementById('postTitle').value = post.title || ''
+  document.getElementById('postExcerpt').value = post.excerpt || ''
+  document.getElementById('postCategory').value = post.category || ''
+  document.getElementById('coverUrl').value = post.cover_image || ''
+  document.getElementById('readTime').value = post.read_time || 5
+  if (post.cover_image) previewCover(post.cover_image)
+  tags = post.tags || []; renderTags()
+  setFeaturedState(post.featured || false)
+  setTimeout(() => setEditorHTML(post.content || ''), 200)
+}
 
-  function insertMath(display) {
-    const latex = prompt(display ? 'Blok LaTeX formülü girin:' : 'Satır içi LaTeX formülü girin:')
-    if (!latex) return
-    const text = display ? `$$${latex}$$` : `$${latex}$`
-    editor.chain().focus().insertContent(text).run()
-  }
+// ── LIST TAB ────────────────────────────────────────
+function showTab(tab) {
+  document.getElementById('editorTab').style.display = tab === 'editor' ? 'block' : 'none'
+  document.getElementById('listTab').style.display = tab === 'list' ? 'block' : 'none'
+  document.getElementById('tabEditor').classList.toggle('active', tab === 'editor')
+  document.getElementById('tabList').classList.toggle('active', tab === 'list')
+  if (tab === 'list') loadPostList()
+}
 
-  // ── TAGS ────────────────────────────────────────────────
-  function addTag() {
-    const val = document.getElementById('tagInput').value.trim().toLowerCase()
-    if (!val || tags.includes(val)) { document.getElementById('tagInput').value = ''; return }
-    tags.push(val)
-    document.getElementById('tagInput').value = ''
-    renderTags()
-  }
-
-  function removeTag(t) {
-    tags = tags.filter(x => x !== t)
-    renderTags()
-  }
-
-  function renderTags() {
-    document.getElementById('tagsWrap').innerHTML = tags.map(t =>
-      `<span class="tag-chip" onclick="removeTag('${t}')">${t} ×</span>`
-    ).join('')
-  }
-
-  // ── FEATURED TOGGLE ─────────────────────────────────────
-  function toggleFeatured() {
-    featured = !featured
-    const btn = document.getElementById('featuredToggle')
-    btn.style.background = featured ? 'var(--accent)' : 'var(--border)'
-    btn.querySelector('.toggle-knob').style.left = featured ? '20px' : '2px'
-  }
-
-  function setFeaturedState(val) {
-    featured = val
-    const btn = document.getElementById('featuredToggle')
-    btn.style.background = val ? 'var(--accent)' : 'var(--border)'
-    btn.querySelector('.toggle-knob').style.left = val ? '20px' : '2px'
-  }
-
-  // ── COVER PREVIEW ────────────────────────────────────────
-  function previewCover(url) {
-    const img = document.getElementById('coverPreview')
-    if (url) { img.src = url; img.style.display = 'block' }
-    else { img.style.display = 'none' }
-  }
-
-  // ── SAVE / PUBLISH ───────────────────────────────────────
-  async function savePost(status) {
-    if (!editor || !currentUser) return
-    const title = document.getElementById('postTitle').value.trim()
-    if (!title) { notify('Başlık gerekli!'); return }
-
-    const slug = title.toLowerCase().replace(/[^a-z0-9ğüşıöç\s]/gi, '').replace(/\s+/g, '-') + '-' + Date.now()
-    const content = editor.getHTML()
-    const excerpt = document.getElementById('postExcerpt').value.trim()
-    const category = document.getElementById('postCategory').value
-    const cover_image = document.getElementById('coverUrl').value.trim()
-    const read_time = parseInt(document.getElementById('readTime').value) || 5
-
-    const payload = {
-      title, slug: editingId ? undefined : slug, excerpt: excerpt || null,
-      content, category: category || null, cover_image: cover_image || null,
-      tags, featured, read_time, status, author_id: currentUser.id,
-      published_at: status === 'published' ? new Date().toISOString() : null,
-    }
-
-    let error
-    if (editingId) {
-      delete payload.slug
-      ;({ error } = await sb.from('posts').update(payload).eq('id', editingId))
-    } else {
-      ;({ error } = await sb.from('posts').insert(payload))
-    }
-
-    if (error) { notify('Hata: ' + error.message); return }
-    notify(status === 'published' ? 'Yayınlandı ✓' : 'Taslak kaydedildi ✓')
-    setTimeout(() => window.location.href = 'index.html', 1000)
-  }
-
-  const saveDraft = () => savePost('draft')
-  const publish = () => savePost('published')
-
-  // ── EDIT PARAM ───────────────────────────────────────────
-  async function checkEditParam() {
-    const params = new URLSearchParams(location.search)
-    const editId = params.get('edit')
-    if (!editId) return
-    editingId = editId
-    document.getElementById('editingLabel').textContent = 'Yazı düzenleniyor'
-    document.getElementById('btnPublish').textContent = 'Güncelle'
-
-    const { data: post } = await sb.from('posts').select('*').eq('id', editId).single()
-    if (!post) return
-    document.getElementById('postTitle').value = post.title || ''
-    document.getElementById('postExcerpt').value = post.excerpt || ''
-    document.getElementById('postCategory').value = post.category || ''
-    document.getElementById('coverUrl').value = post.cover_image || ''
-    document.getElementById('readTime').value = post.read_time || 5
-    if (post.cover_image) previewCover(post.cover_image)
-    tags = post.tags || []
-    renderTags()
-    setFeaturedState(post.featured || false)
-    setTimeout(() => { if (editor) editor.commands.setContent(post.content || '') }, 300)
-  }
-
-  // ── LIST TAB ─────────────────────────────────────────────
-  function showTab(tab) {
-    document.getElementById('editorTab').style.display = tab === 'editor' ? 'block' : 'none'
-    document.getElementById('listTab').style.display = tab === 'list' ? 'block' : 'none'
-    document.getElementById('tabEditor').classList.toggle('active', tab === 'editor')
-    document.getElementById('tabList').classList.toggle('active', tab === 'list')
-    if (tab === 'list') loadPostList()
-  }
-
-  async function loadPostList() {
-    if (!currentUser) return
-    const { data } = await sb.from('posts').select('*').eq('author_id', currentUser.id).order('created_at', { ascending: false })
-    const posts = data || []
-
-    document.getElementById('postRows').innerHTML = posts.length === 0
-      ? '<p style="text-align:center;color:var(--text-mut);padding:2rem">Henüz yazı yok.</p>'
-      : posts.map(p => `
-        <div class="post-row">
-          <div class="post-row-info">
-            <div style="display:flex;gap:.4rem;align-items:center;margin-bottom:.3rem">
-              <span class="status-pill ${p.status === 'published' ? 'status-published' : 'status-draft'}">${p.status === 'published' ? 'Yayında' : 'Taslak'}</span>
-            </div>
-            <div class="post-row-title">${p.title}</div>
-            <div class="post-row-meta">${new Date(p.created_at).toLocaleDateString('tr-TR')} · ${p.view_count || 0} görüntüleme</div>
+async function loadPostList() {
+  if (!currentUser) return
+  const { data } = await sb.from('posts').select('*').eq('author_id', currentUser.id).order('created_at', { ascending: false })
+  const posts = data || []
+  document.getElementById('postRows').innerHTML = posts.length === 0
+    ? '<p style="text-align:center;color:var(--text-mut);padding:2rem">Henüz yazı yok.</p>'
+    : posts.map(p => `
+      <div class="post-row">
+        <div class="post-row-info">
+          <div style="margin-bottom:.3rem">
+            <span class="status-pill ${p.status === 'published' ? 'status-published' : 'status-draft'}">${p.status === 'published' ? 'Yayında' : 'Taslak'}</span>
           </div>
-          <div class="row-actions">
-            <button class="row-btn" onclick="window.location.href='post.html?id=${p.id}'">👁 Gör</button>
-            <button class="row-btn" onclick="window.location.href='admin.html?edit=${p.id}'">✏ Düzenle</button>
-            <button class="row-btn" onclick="toggleStatus('${p.id}','${p.status}')">${p.status === 'published' ? '⬇ Taslak' : '⬆ Yayınla'}</button>
-            <button class="row-btn danger" onclick="deletePost('${p.id}')">🗑</button>
-          </div>
-        </div>`).join('')
-  }
+          <div class="post-row-title">${p.title}</div>
+          <div class="post-row-meta">${new Date(p.created_at).toLocaleDateString('tr-TR')} · ${p.view_count || 0} görüntüleme</div>
+        </div>
+        <div class="row-actions">
+          <button class="row-btn" onclick="location.href='post.html?id=${p.id}'">👁 Gör</button>
+          <button class="row-btn" onclick="location.href='admin.html?edit=${p.id}'">✏ Düzenle</button>
+          <button class="row-btn" onclick="toggleStatus('${p.id}','${p.status}')">${p.status === 'published' ? '⬇ Taslak' : '⬆ Yayınla'}</button>
+          <button class="row-btn danger" onclick="deletePost('${p.id}')">🗑</button>
+        </div>
+      </div>`).join('')
+}
 
-  async function toggleStatus(id, current) {
-    const newStatus = current === 'published' ? 'draft' : 'published'
-    await sb.from('posts').update({ status: newStatus, published_at: newStatus === 'published' ? new Date().toISOString() : null }).eq('id', id)
-    loadPostList()
-  }
+async function toggleStatus(id, current) {
+  const s = current === 'published' ? 'draft' : 'published'
+  await sb.from('posts').update({ status: s, published_at: s === 'published' ? new Date().toISOString() : null }).eq('id', id)
+  loadPostList()
+}
 
-  async function deletePost(id) {
-    if (!confirm('Bu yazıyı silmek istiyor musunuz?')) return
-    await sb.from('posts').delete().eq('id', id)
-    loadPostList()
-  }
+async function deletePost(id) {
+  if (!confirm('Bu yazıyı silmek istiyor musunuz?')) return
+  await sb.from('posts').delete().eq('id', id)
+  loadPostList()
+}
 
-  function clearEditor() {
-    if (!confirm('Editörü temizlemek istiyor musunuz?')) return
-    document.getElementById('postTitle').value = ''
-    document.getElementById('postExcerpt').value = ''
-    document.getElementById('postCategory').value = ''
-    document.getElementById('coverUrl').value = ''
-    document.getElementById('readTime').value = 5
-    document.getElementById('coverPreview').style.display = 'none'
-    tags = []; renderTags()
-    setFeaturedState(false)
-    if (editor) editor.commands.clearContent()
-    editingId = null
-    document.getElementById('editingLabel').textContent = ''
-    document.getElementById('btnPublish').textContent = 'Yayınla'
-  }
+function clearEditor() {
+  if (!confirm('Temizlemek istiyor musunuz?')) return
+  document.getElementById('postTitle').value = ''
+  document.getElementById('postExcerpt').value = ''
+  document.getElementById('postCategory').value = ''
+  document.getElementById('coverUrl').value = ''
+  document.getElementById('readTime').value = 5
+  document.getElementById('coverPreview').style.display = 'none'
+  setEditorHTML('')
+  tags = []; renderTags()
+  setFeaturedState(false)
+  editingId = null
+  document.getElementById('editingLabel').textContent = ''
+  document.getElementById('btnPublish').textContent = 'Yayınla'
+}
 
-  // ── NOTIFY ───────────────────────────────────────────────
-  function notify(msg) {
-    const el = document.getElementById('notif')
-    el.textContent = msg
-    el.classList.add('show')
-    setTimeout(() => el.classList.remove('show'), 2500)
-  }
+function notify(msg) {
+  const el = document.getElementById('notif')
+  el.textContent = msg
+  el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), 2500)
+}
 </script>
 </body>
 </html>
