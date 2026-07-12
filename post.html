@@ -184,7 +184,7 @@
     // Increment view
     sb.from('posts').update({ view_count: (post.view_count || 0) + 1 }).eq('id', postId).then(() => {})
 
-    const cat = CATEGORIES.find(c => c.slug === post.category)
+    const cat = categories.find(c => c.slug === post.category)
 
     const isAdmin = currentUser?.id === ADMIN_USER_ID
     const adminBar = isAdmin ? `
