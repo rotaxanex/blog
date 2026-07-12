@@ -235,13 +235,25 @@
       <div id="categoryPanel"></div>
     </div>
 
-    <div id="settingsTab" style="display:none">
+ <div id="settingsTab" style="display:none">
       <div style="max-width:520px">
-        <div class="side-card">
-          <span class="side-label">Hakkında Metni</span>
-          <textarea id="aboutTextarea" rows="5" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.75rem;font-size:.9rem;color:var(--text);resize:vertical;outline:none;font-family:'Sora',sans-serif;margin-top:.25rem" placeholder="Kendinizi tanıtan kısa bir metin..."></textarea>
-          <button class="btn btn-primary" onclick="saveAbout()" style="margin-top:.75rem;font-size:.82rem">Kaydet</button>
+        <div class="side-card" style="margin-bottom:1rem">
+          <span class="side-label">Üst Etiket</span>
+          <input type="text" id="heroTagInput" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.6rem;font-size:.9rem;color:var(--text);outline:none;font-family:'Sora',sans-serif;margin-top:.25rem" placeholder="✦ Düşünceler & Keşifler" />
         </div>
+        <div class="side-card" style="margin-bottom:1rem">
+          <span class="side-label">Ana Başlık (satır atlatmak için &lt;br&gt; kullan)</span>
+          <textarea id="heroTitleInput" rows="2" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.6rem;font-size:.9rem;color:var(--text);resize:vertical;outline:none;font-family:'Sora',sans-serif;margin-top:.25rem" placeholder="Bilim, Teknoloji<br>ve Yaşam Üzerine"></textarea>
+        </div>
+        <div class="side-card" style="margin-bottom:1rem">
+          <span class="side-label">Alt Başlık</span>
+          <textarea id="heroSubtitleInput" rows="2" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.6rem;font-size:.9rem;color:var(--text);resize:vertical;outline:none;font-family:'Sora',sans-serif;margin-top:.25rem" placeholder="Kısa bir açıklama..."></textarea>
+        </div>
+        <div class="side-card" style="margin-bottom:1rem">
+          <span class="side-label">Hakkında Metni (sidebar)</span>
+          <textarea id="aboutTextarea" rows="5" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.75rem;font-size:.9rem;color:var(--text);resize:vertical;outline:none;font-family:'Sora',sans-serif;margin-top:.25rem" placeholder="Kendinizi tanıtan kısa bir metin..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()" style="font-size:.85rem">Tümünü Kaydet</button>
       </div>
     </div>
   </div>
@@ -347,14 +359,23 @@ async function deleteCategory(id, slug) {
 
 // ── SETTINGS ──
 async function loadSettingsTab() {
-  var res = await sb.from('settings').select('value').eq('key', 'about_text').single()
-  document.getElementById('aboutTextarea').value = (res.data && res.data.value) ? res.data.value : ''
+  var res = await sb.from('settings').select('key, value')
+  var map = {}
+  ;(res.data || []).forEach(function(r) { map[r.key] = r.value })
+  document.getElementById('heroTagInput').value = map.hero_tag || ''
+  document.getElementById('heroTitleInput').value = map.hero_title || ''
+  document.getElementById('heroSubtitleInput').value = map.hero_subtitle || ''
+  document.getElementById('aboutTextarea').value = map.about_text || ''
 }
 
-async function saveAbout() {
-  var text = document.getElementById('aboutTextarea').value.trim()
-  if (!text) { notify('Metin boş olamaz!'); return }
-  var res = await sb.from('settings').upsert({ key: 'about_text', value: text, updated_at: new Date().toISOString() })
+async function saveSettings() {
+  var rows = [
+    { key: 'hero_tag', value: document.getElementById('heroTagInput').value.trim(), updated_at: new Date().toISOString() },
+    { key: 'hero_title', value: document.getElementById('heroTitleInput').value.trim(), updated_at: new Date().toISOString() },
+    { key: 'hero_subtitle', value: document.getElementById('heroSubtitleInput').value.trim(), updated_at: new Date().toISOString() },
+    { key: 'about_text', value: document.getElementById('aboutTextarea').value.trim(), updated_at: new Date().toISOString() }
+  ]
+  var res = await sb.from('settings').upsert(rows)
   if (res.error) { notify('Hata: ' + res.error.message); return }
   notify('Kaydedildi ✓')
 }
