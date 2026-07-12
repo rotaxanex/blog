@@ -37,7 +37,7 @@
     /* NAV */
     nav { background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
     .nav-inner { max-width: 900px; margin: 0 auto; padding: 0 1.25rem; height: 52px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-family: 'Lora', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); cursor: pointer; }
+    .logo { font-family: 'Lora', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 6px; }
     .nav-links { display: flex; align-items: center; gap: 1.5rem; }
     .nav-links a { font-size: .85rem; color: var(--text-sec); }
     .nav-links a:hover { color: var(--accent); }
@@ -103,7 +103,10 @@
 
 <nav>
   <div class="nav-inner">
-    <span class="logo" onclick="filterCategory(null)">   <img src="logo.png" alt="Logo" style="height:26px;vertical-align:middle;margin-right:6px;background:transparent;mix-blend-mode:normal" />   Paracelsusx </span>
+    <span class="logo" onclick="filterCategory(null)">
+      <img src="logo.png" alt="Logo" style="height:26px;vertical-align:middle" />
+      Paracelsusx
+    </span>
     <div class="nav-links">
       <a href="index.html">Yazılar</a>
       <a href="admin.html" class="btn-admin" id="adminLink" style="display:none">+ Yeni Yazı</a>
@@ -157,7 +160,7 @@
   let allPosts = []
   let activeCategory = null
 
-  // Theme
+  // ── THEME ──
   if (localStorage.getItem('theme') === 'dark') {
     document.documentElement.classList.add('dark')
     document.getElementById('themeBtn').textContent = '☀️'
@@ -168,7 +171,7 @@
     document.getElementById('themeBtn').textContent = dark ? '☀️' : '🌙'
   }
 
-  // Auth check
+  // ── AUTH CHECK ──
   sb.auth.getSession().then(({ data: { session } }) => {
     if (session?.user?.id === ADMIN_USER_ID) {
       document.getElementById('adminLink').style.display = 'block'
@@ -180,6 +183,7 @@
     }
   })
 
+  // ── LOADERS ──
   async function loadCategories() {
     const { data } = await sb.from('categories').select('*').order('created_at')
     categories = data || []
@@ -196,14 +200,14 @@
     if (map.about_text) document.getElementById('aboutText').textContent = map.about_text
   }
 
-  loadSettings()
-  loadPosts()
+  async function loadPosts() {
     await loadCategories()
     const { data } = await sb.from('posts').select('*').eq('status', 'published').order('published_at', { ascending: false })
     allPosts = data || []
     renderAll()
   }
 
+  // ── FILTER ──
   function filterCategory(slug) {
     activeCategory = slug
     document.querySelectorAll('.pill').forEach(p => {
@@ -212,10 +216,10 @@
     renderPosts()
   }
 
+  // ── RENDER ──
   function renderAll() {
     const featured = allPosts.find(p => p.featured) || allPosts[0]
 
-    // Featured card
     if (featured) {
       const cat = categories.find(c => c.slug === featured.category)
       document.getElementById('featuredSection').innerHTML = `
@@ -237,18 +241,15 @@
       document.getElementById('featuredSection').innerHTML = ''
     }
 
-    // Counts per category
     const counts = {}
     allPosts.forEach(p => { if (p.category) counts[p.category] = (counts[p.category] || 0) + 1 })
 
-    // Filter pills
     document.getElementById('filters').innerHTML =
       `<span class="pill active" data-slug="null" onclick="filterCategory(null)">Tümü (${allPosts.length})</span>` +
       categories.filter(c => counts[c.slug]).map(c =>
         `<span class="pill" data-slug="${c.slug}" onclick="filterCategory('${c.slug}')">${c.name} (${counts[c.slug]})</span>`
       ).join('')
 
-    // Sidebar category list
     document.getElementById('catList').innerHTML = categories.filter(c => counts[c.slug]).map(c => `
       <div class="cat-item" onclick="filterCategory('${c.slug}')">
         <span><span class="cat-dot" style="background:${c.color}"></span>${c.name}</span>
@@ -294,6 +295,8 @@
     return new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
   }
 
+  // ── START ──
+  loadSettings()
   loadPosts()
 </script>
 </body>
