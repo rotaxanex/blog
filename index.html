@@ -71,7 +71,7 @@
     .post-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; cursor: pointer; transition: box-shadow .2s; }
     .post-card:hover { box-shadow: 0 2px 12px #0001; }
     .post-card h3 { font-family: 'Lora', serif; font-size: .95rem; font-weight: 600; color: var(--text); margin-bottom: .3rem; }
-    .post-card p { font-size: .82rem; color: var(--text-sec); line-clamp: 2; -webkit-line-clamp: 2; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; }
+    .post-card p { font-size: .82rem; color: var(--text-sec); -webkit-line-clamp: 2; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; }
     .post-meta { display: flex; gap: .75rem; font-size: .72rem; color: var(--text-mut); margin-top: .5rem; }
 
     /* CATEGORY BADGE */
@@ -121,20 +121,14 @@
 
 <div class="main">
   <div>
-    <!-- Featured -->
     <div id="featuredSection"></div>
-
-    <!-- Filters -->
     <div class="filters" id="filters"></div>
-
-    <!-- Post list -->
     <div class="section-head">
       <h2>Son Yazılar</h2>
     </div>
     <div id="postList"><div class="spinner"></div></div>
   </div>
 
-  <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-card">
       <h3>Kategoriler</h3>
@@ -154,22 +148,19 @@
   const SUPABASE_URL = 'https://umuiojigaasxaanxbiil.supabase.co'
   const SUPABASE_ANON_KEY = 'sb_publishable_1TLYJD-tBtAFjPw9l6EktQ_XqQ42TzV'
   const ADMIN_USER_ID = '9cc50286-6229-4b2b-a3e6-883a812f2390'
-
   // ────────────────────────────────────────────────────────
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  let categories = []
-  async function loadCategories() {
-    const { data } = await sb.from('categories').select('*').order('created_at')
-    categories = data || []
-  }
 
+  let categories = []
   let allPosts = []
   let activeCategory = null
 
   // Theme
-  const saved = localStorage.getItem('theme')
-  if (saved === 'dark') { document.documentElement.classList.add('dark'); document.getElementById('themeBtn').textContent = '☀️' }
+  if (localStorage.getItem('theme') === 'dark') {
+    document.documentElement.classList.add('dark')
+    document.getElementById('themeBtn').textContent = '☀️'
+  }
   function toggleTheme() {
     const dark = document.documentElement.classList.toggle('dark')
     localStorage.setItem('theme', dark ? 'dark' : 'light')
@@ -188,7 +179,11 @@
     }
   })
 
-  // Load posts
+  async function loadCategories() {
+    const { data } = await sb.from('categories').select('*').order('created_at')
+    categories = data || []
+  }
+
   async function loadPosts() {
     await loadCategories()
     const { data } = await sb.from('posts').select('*').eq('status', 'published').order('published_at', { ascending: false })
@@ -198,15 +193,18 @@
 
   function filterCategory(slug) {
     activeCategory = slug
-    document.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.dataset.slug === slug))
-    renderPosts(slug ? allPosts.filter(p => p.category === slug) : allPosts)
+    document.querySelectorAll('.pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.slug === (slug === null ? 'null' : slug))
+    })
+    renderPosts()
   }
 
   function renderAll() {
-    // Featured
     const featured = allPosts.find(p => p.featured) || allPosts[0]
+
+    // Featured card
     if (featured) {
-      const cat = CATEGORIES.find(c => c.slug === featured.category)
+      const cat = categories.find(c => c.slug === featured.category)
       document.getElementById('featuredSection').innerHTML = `
         <p class="featured-label">Öne Çıkan</p>
         <div class="featured-card" onclick="goPost('${featured.id}')">
@@ -222,33 +220,48 @@
             </div>
           </div>
         </div>`
+    } else {
+      document.getElementById('featuredSection').innerHTML = ''
     }
 
-    // Filters
+    // Counts per category
     const counts = {}
-    allPosts.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1 })
+    allPosts.forEach(p => { if (p.category) counts[p.category] = (counts[p.category] || 0) + 1 })
+
+    // Filter pills
     document.getElementById('filters').innerHTML =
       `<span class="pill active" data-slug="null" onclick="filterCategory(null)">Tümü (${allPosts.length})</span>` +
-      CATEGORIES.filter(c => counts[c.slug]).map(c =>
-        `<span class="pill" data-slug="${c.slug}" onclick="filterCategory('${c.slug}')">${c.name} (${counts[c.slug] || 0})</span>`
+      categories.filter(c => counts[c.slug]).map(c =>
+        `<span class="pill" data-slug="${c.slug}" onclick="filterCategory('${c.slug}')">${c.name} (${counts[c.slug]})</span>`
       ).join('')
 
-    // Sidebar categories
-    document.getElementById('catList').innerHTML = CATEGORIES.filter(c => counts[c.slug]).map(c => `
+    // Sidebar category list
+    document.getElementById('catList').innerHTML = categories.filter(c => counts[c.slug]).map(c => `
       <div class="cat-item" onclick="filterCategory('${c.slug}')">
         <span><span class="cat-dot" style="background:${c.color}"></span>${c.name}</span>
-        <span class="cat-count">${counts[c.slug] || 0}</span>
-      </div>`).join('')
+        <span class="cat-count">${counts[c.slug]}</span>
+      </div>`).join('') || '<p style="font-size:.8rem;color:var(--text-mut)">Henüz kategori yok.</p>'
 
-    renderPosts(allPosts.filter(p => featured ? p.id !== featured.id : true))
+    renderPosts()
   }
 
-  function renderPosts(posts) {
+  function renderPosts() {
     const featured = allPosts.find(p => p.featured) || allPosts[0]
-    const list = activeCategory ? posts : posts.filter(p => p.id !== (featured?.id))
-    if (!list.length) { document.getElementById('postList').innerHTML = '<p class="empty">Henüz yazı yok.</p>'; return }
+
+    let list
+    if (activeCategory) {
+      list = allPosts.filter(p => p.category === activeCategory)
+    } else {
+      list = allPosts.filter(p => !featured || p.id !== featured.id)
+    }
+
+    if (!list.length) {
+      document.getElementById('postList').innerHTML = '<p class="empty">Henüz yazı yok.</p>'
+      return
+    }
+
     document.getElementById('postList').innerHTML = `<div class="post-list">${list.map(p => {
-      const cat = CATEGORIES.find(c => c.slug === p.category)
+      const cat = categories.find(c => c.slug === p.category)
       return `<div class="post-card" onclick="goPost('${p.id}')">
         ${cat ? `<span class="badge" style="background:${cat.color}20;color:${cat.color}">${cat.name}</span>` : ''}
         <h3>${p.title}</h3>
@@ -268,12 +281,6 @@
     return new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
   }
 
-  async function loadAbout() {
-    const { data } = await sb.from('settings').select('value').eq('key', 'about_text').single()
-    if (data?.value) document.getElementById('aboutText').textContent = data.value
-  }
-
-  loadAbout()
   loadPosts()
 </script>
 </body>
