@@ -114,9 +114,10 @@
 </nav>
 
 <div class="hero">
-  <p class="hero-tag">✦ Düşünceler &amp; Keşifler</p>
-  <h1>Bilim, Teknoloji<br>ve Yaşam Üzerine</h1>
-  <p>Malzeme biliminden yazılıma, akademik notlardan kişisel gözlemlere.</p>
+  <img src="logo.png" alt="Logo" style="height:90px;margin-bottom:1.25rem" />
+  <p class="hero-tag" id="heroTag">✦ Düşünceler &amp; Keşifler</p>
+  <h1 id="heroTitle">Bilim, Teknoloji<br>ve Yaşam Üzerine</h1>
+  <p id="heroSubtitle">Malzeme biliminden yazılıma, akademik notlardan kişisel gözlemlere.</p>
 </div>
 
 <div class="main">
@@ -184,7 +185,19 @@
     categories = data || []
   }
 
-  async function async function loadAbout() {     const { data } = await sb.from('settings').select('value').eq('key', 'about_text').single()     if (data && data.value) document.getElementById('aboutText').textContent = data.value   }    loadAbout()   loadPosts(){
+  async function loadSettings() {
+    const { data } = await sb.from('settings').select('key, value')
+    if (!data) return
+    const map = {}
+    data.forEach(r => { map[r.key] = r.value })
+    if (map.hero_tag) document.getElementById('heroTag').innerHTML = map.hero_tag
+    if (map.hero_title) document.getElementById('heroTitle').innerHTML = map.hero_title
+    if (map.hero_subtitle) document.getElementById('heroSubtitle').textContent = map.hero_subtitle
+    if (map.about_text) document.getElementById('aboutText').textContent = map.about_text
+  }
+
+  loadSettings()
+  loadPosts()
     await loadCategories()
     const { data } = await sb.from('posts').select('*').eq('status', 'published').order('published_at', { ascending: false })
     allPosts = data || []
