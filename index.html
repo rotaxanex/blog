@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #f8f6f2;
+      --card: #ffffff;
+      --muted: #f0ece5;
+      --border: #e4dbd0;
+      --text: #1c1a17;
+      --text-sec: #5a5049;
+      --text-mut: #9e9187;
+      --accent: #2b57e0;
+      --accent-muted: #eaeffc;
+    }
+    .dark {
+      --bg: #0f0e0c;
+      --card: #181714;
+      --muted: #201e1b;
+      --border: #2c2924;
+      --text: #f2efe9;
+      --text-sec: #b3a99e;
+      --text-mut: #655e56;
+      --accent: #607df2;
+      --accent-muted: #192040;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; transition: background .3s, color .3s; }
+    a { text-decoration: none; color: inherit; }
+
+    /* NAV */
+    nav { background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
+    .nav-inner { max-width: 900px; margin: 0 auto; padding: 0 1.25rem; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-family: 'Lora', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); cursor: pointer; }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-links a { font-size: .85rem; color: var(--text-sec); }
+    .nav-links a:hover { color: var(--accent); }
+    .btn-theme { background: var(--muted); border: none; border-radius: 8px; padding: 4px 10px; cursor: pointer; font-size: .85rem; color: var(--text-mut); }
+    .btn-admin { background: var(--accent); color: #fff !important; padding: 5px 12px; border-radius: 8px; font-size: .82rem; font-weight: 600; }
+
+    /* HERO */
+    .hero { text-align: center; padding: 3.5rem 1.25rem 2.5rem; }
+    .hero-tag { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: .75rem; }
+    .hero h1 { font-family: 'Lora', serif; font-size: 2.6rem; font-weight: 700; line-height: 1.2; color: var(--text); margin-bottom: 1rem; }
+    .hero p { font-size: 1rem; color: var(--text-sec); max-width: 480px; margin: 0 auto; }
+
+    /* MAIN LAYOUT */
+    .main { max-width: 900px; margin: 0 auto; padding: 0 1.25rem 4rem; display: grid; grid-template-columns: 1fr 260px; gap: 2rem; }
+    @media (max-width: 680px) { .main { grid-template-columns: 1fr; } .hero h1 { font-size: 1.9rem; } }
+
+    /* FEATURED */
+    .featured-label { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-mut); margin-bottom: 1rem; }
+    .featured-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; cursor: pointer; margin-bottom: 2rem; transition: box-shadow .2s; }
+    .featured-card:hover { box-shadow: 0 4px 24px #0002; }
+    .featured-band { height: 5px; background: linear-gradient(90deg, #2b57e0, #06b6d4, #8b5cf6); }
+    .featured-body { padding: 1.75rem; }
+    .featured-body h2 { font-family: 'Lora', serif; font-size: 1.5rem; font-weight: 700; color: var(--text); margin: .6rem 0; line-height: 1.3; }
+    .featured-body p { color: var(--text-sec); line-height: 1.7; font-size: .95rem; }
+
+    /* POST LIST */
+    .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .section-head h2 { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 700; color: var(--text); }
+    .section-head a { font-size: .8rem; color: var(--accent); }
+    .post-list { display: flex; flex-direction: column; gap: .6rem; }
+    .post-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; cursor: pointer; transition: box-shadow .2s; }
+    .post-card:hover { box-shadow: 0 2px 12px #0001; }
+    .post-card h3 { font-family: 'Lora', serif; font-size: .95rem; font-weight: 600; color: var(--text); margin-bottom: .3rem; }
+    .post-card p { font-size: .82rem; color: var(--text-sec); line-clamp: 2; -webkit-line-clamp: 2; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; }
+    .post-meta { display: flex; gap: .75rem; font-size: .72rem; color: var(--text-mut); margin-top: .5rem; }
+
+    /* CATEGORY BADGE */
+    .badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 9px; border-radius: 999px; margin-bottom: .4rem; }
+
+    /* SIDEBAR */
+    .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+    .sidebar-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem; }
+    .sidebar-card h3 { font-family: 'Lora', serif; font-size: .95rem; font-weight: 700; color: var(--text); margin-bottom: .75rem; }
+    .cat-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: .5rem; font-size: .85rem; color: var(--text-sec); cursor: pointer; }
+    .cat-item:hover { color: var(--accent); }
+    .cat-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: .5rem; }
+    .cat-count { font-size: .72rem; color: var(--text-mut); }
+
+    /* EMPTY */
+    .empty { text-align: center; padding: 3rem 1rem; color: var(--text-mut); font-family: 'Lora', serif; font-size: 1.1rem; }
+
+    /* FILTER PILLS */
+    .filters { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.25rem; }
+    .pill { font-size: .72rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--text-sec); cursor: pointer; transition: all .15s; }
+    .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* LOADING */
+    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin: 3rem auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <span class="logo" onclick="filterCategory(null)">✦ Blog</span>
+    <div class="nav-links">
+      <a href="index.html">Yazılar</a>
+      <a href="admin.html" class="btn-admin" id="adminLink" style="display:none">+ Yeni Yazı</a>
+      <span id="authLink" style="font-size:.85rem;color:var(--text-sec);cursor:pointer" onclick="window.location='admin.html'">Giriş</span>
+      <button class="btn-theme" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <p class="hero-tag">✦ Düşünceler &amp; Keşifler</p>
+  <h1>Bilim, Teknoloji<br>ve Yaşam Üzerine</h1>
+  <p>Malzeme biliminden yazılıma, akademik notlardan kişisel gözlemlere.</p>
+</div>
+
+<div class="main">
+  <div>
+    <!-- Featured -->
+    <div id="featuredSection"></div>
+
+    <!-- Filters -->
+    <div class="filters" id="filters"></div>
+
+    <!-- Post list -->
+    <div class="section-head">
+      <h2>Son Yazılar</h2>
+    </div>
+    <div id="postList"><div class="spinner"></div></div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-card">
+      <h3>Kategoriler</h3>
+      <div id="catList"></div>
+    </div>
+    <div class="sidebar-card">
+      <h3>Hakkında</h3>
+      <p id="aboutText" style="font-size:.85rem;color:var(--text-sec);line-height:1.6">
+        Malzeme bilimi öğrencisi, yazılım meraklısı. Bu blog düşüncelerimi ve öğrendiklerimi paylaştığım bir alan.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── CONFIG ──────────────────────────────────────────────
+  const SUPABASE_URL = 'https://umuiojigaasxaanxbiil.supabase.co'
+  const SUPABASE_ANON_KEY = 'sb_publishable_1TLYJD-tBtAFjPw9l6EktQ_XqQ42TzV'
+  const ADMIN_USER_ID = '9cc50286-6229-4b2b-a3e6-883a812f2390'
+
+  // ────────────────────────────────────────────────────────
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  let categories = []
+  async function loadCategories() {
+    const { data } = await sb.from('categories').select('*').order('created_at')
+    categories = data || []
+  }
+
+  let allPosts = []
+  let activeCategory = null
+
+  // Theme
+  const saved = localStorage.getItem('theme')
+  if (saved === 'dark') { document.documentElement.classList.add('dark'); document.getElementById('themeBtn').textContent = '☀️' }
+  function toggleTheme() {
+    const dark = document.documentElement.classList.toggle('dark')
+    localStorage.setItem('theme', dark ? 'dark' : 'light')
+    document.getElementById('themeBtn').textContent = dark ? '☀️' : '🌙'
+  }
+
+  // Auth check
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session?.user?.id === ADMIN_USER_ID) {
+      document.getElementById('adminLink').style.display = 'block'
+      document.getElementById('authLink').textContent = 'Çıkış'
+      document.getElementById('authLink').onclick = () => sb.auth.signOut().then(() => location.reload())
+    } else if (session) {
+      document.getElementById('authLink').textContent = 'Çıkış'
+      document.getElementById('authLink').onclick = () => sb.auth.signOut().then(() => location.reload())
+    }
+  })
+
+  // Load posts
+  async function loadPosts() {
+    await loadCategories()
+    const { data } = await sb.from('posts').select('*').eq('status', 'published').order('published_at', { ascending: false })
+    allPosts = data || []
+    renderAll()
+  }
+
+  function filterCategory(slug) {
+    activeCategory = slug
+    document.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.dataset.slug === slug))
+    renderPosts(slug ? allPosts.filter(p => p.category === slug) : allPosts)
+  }
+
+  function renderAll() {
+    // Featured
+    const featured = allPosts.find(p => p.featured) || allPosts[0]
+    if (featured) {
+      const cat = CATEGORIES.find(c => c.slug === featured.category)
+      document.getElementById('featuredSection').innerHTML = `
+        <p class="featured-label">Öne Çıkan</p>
+        <div class="featured-card" onclick="goPost('${featured.id}')">
+          <div class="featured-band"></div>
+          <div class="featured-body">
+            ${cat ? `<span class="badge" style="background:${cat.color}20;color:${cat.color}">${cat.name}</span>` : ''}
+            <h2>${featured.title}</h2>
+            <p>${featured.excerpt || ''}</p>
+            <div class="post-meta">
+              <span>${formatDate(featured.published_at)}</span>
+              <span>· ${featured.read_time || 5} dk</span>
+              <span>· ${featured.view_count || 0} görüntüleme</span>
+            </div>
+          </div>
+        </div>`
+    }
+
+    // Filters
+    const counts = {}
+    allPosts.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1 })
+    document.getElementById('filters').innerHTML =
+      `<span class="pill active" data-slug="null" onclick="filterCategory(null)">Tümü (${allPosts.length})</span>` +
+      CATEGORIES.filter(c => counts[c.slug]).map(c =>
+        `<span class="pill" data-slug="${c.slug}" onclick="filterCategory('${c.slug}')">${c.name} (${counts[c.slug] || 0})</span>`
+      ).join('')
+
+    // Sidebar categories
+    document.getElementById('catList').innerHTML = CATEGORIES.filter(c => counts[c.slug]).map(c => `
+      <div class="cat-item" onclick="filterCategory('${c.slug}')">
+        <span><span class="cat-dot" style="background:${c.color}"></span>${c.name}</span>
+        <span class="cat-count">${counts[c.slug] || 0}</span>
+      </div>`).join('')
+
+    renderPosts(allPosts.filter(p => featured ? p.id !== featured.id : true))
+  }
+
+  function renderPosts(posts) {
+    const featured = allPosts.find(p => p.featured) || allPosts[0]
+    const list = activeCategory ? posts : posts.filter(p => p.id !== (featured?.id))
+    if (!list.length) { document.getElementById('postList').innerHTML = '<p class="empty">Henüz yazı yok.</p>'; return }
+    document.getElementById('postList').innerHTML = `<div class="post-list">${list.map(p => {
+      const cat = CATEGORIES.find(c => c.slug === p.category)
+      return `<div class="post-card" onclick="goPost('${p.id}')">
+        ${cat ? `<span class="badge" style="background:${cat.color}20;color:${cat.color}">${cat.name}</span>` : ''}
+        <h3>${p.title}</h3>
+        ${p.excerpt ? `<p>${p.excerpt}</p>` : ''}
+        <div class="post-meta">
+          <span>${formatDate(p.published_at)}</span>
+          <span>· ${p.read_time || 5} dk</span>
+        </div>
+      </div>`
+    }).join('')}</div>`
+  }
+
+  function goPost(id) { window.location.href = `post.html?id=${id}` }
+
+  function formatDate(d) {
+    if (!d) return ''
+    return new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
+  }
+
+  async function loadAbout() {
+    const { data } = await sb.from('settings').select('value').eq('key', 'about_text').single()
+    if (data?.value) document.getElementById('aboutText').textContent = data.value
+  }
+
+  loadAbout()
+  loadPosts()
+</script>
+</body>
+</html>
