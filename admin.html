@@ -236,24 +236,38 @@
       <div id="categoryPanel"></div>
     </div>
 
- <div id="settingsTab" style="display:none">
-      <div style="max-width:520px">
+<div id="settingsTab" style="display:none">
+      <div style="max-width:560px">
+        <p style="font-size:.8rem;color:var(--text-mut);margin-bottom:1rem">Her metni 3 dilde girebilirsin. Boş bıraktığın dil, Türkçe'ye düşer.</p>
+
         <div class="side-card" style="margin-bottom:1rem">
-          <span class="side-label">Üst Etiket</span>
-          <input type="text" id="heroTagInput" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.6rem;font-size:.9rem;color:var(--text);outline:none;font-family:'Sora',sans-serif;margin-top:.25rem" placeholder="✦ Düşünceler & Keşifler" />
+          <span class="side-label">Üst Etiket (Hero)</span>
+          <input type="text" id="heroTag_tr" placeholder="🇹🇷 Türkçe" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);outline:none;margin-bottom:.4rem;font-family:'Sora',sans-serif" />
+          <input type="text" id="heroTag_en" placeholder="🇬🇧 English" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);outline:none;margin-bottom:.4rem;font-family:'Sora',sans-serif" />
+          <input type="text" id="heroTag_de" placeholder="🇩🇪 Deutsch" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);outline:none;font-family:'Sora',sans-serif" />
         </div>
+
         <div class="side-card" style="margin-bottom:1rem">
           <span class="side-label">Ana Başlık (satır atlatmak için &lt;br&gt; kullan)</span>
-          <textarea id="heroTitleInput" rows="2" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.6rem;font-size:.9rem;color:var(--text);resize:vertical;outline:none;font-family:'Sora',sans-serif;margin-top:.25rem" placeholder="Bilim, Teknoloji<br>ve Yaşam Üzerine"></textarea>
+          <textarea id="heroTitle_tr" rows="2" placeholder="🇹🇷 Türkçe" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);resize:vertical;outline:none;margin-bottom:.4rem;font-family:'Sora',sans-serif"></textarea>
+          <textarea id="heroTitle_en" rows="2" placeholder="🇬🇧 English" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);resize:vertical;outline:none;margin-bottom:.4rem;font-family:'Sora',sans-serif"></textarea>
+          <textarea id="heroTitle_de" rows="2" placeholder="🇩🇪 Deutsch" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);resize:vertical;outline:none;font-family:'Sora',sans-serif"></textarea>
         </div>
+
         <div class="side-card" style="margin-bottom:1rem">
-          <span class="side-label">Alt Başlık</span>
-          <textarea id="heroSubtitleInput" rows="2" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.6rem;font-size:.9rem;color:var(--text);resize:vertical;outline:none;font-family:'Sora',sans-serif;margin-top:.25rem" placeholder="Kısa bir açıklama..."></textarea>
+          <span class="side-label">Alt Başlık (Hero)</span>
+          <textarea id="heroSubtitle_tr" rows="2" placeholder="🇹🇷 Türkçe" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);resize:vertical;outline:none;margin-bottom:.4rem;font-family:'Sora',sans-serif"></textarea>
+          <textarea id="heroSubtitle_en" rows="2" placeholder="🇬🇧 English" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);resize:vertical;outline:none;margin-bottom:.4rem;font-family:'Sora',sans-serif"></textarea>
+          <textarea id="heroSubtitle_de" rows="2" placeholder="🇩🇪 Deutsch" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);resize:vertical;outline:none;font-family:'Sora',sans-serif"></textarea>
         </div>
+
         <div class="side-card" style="margin-bottom:1rem">
           <span class="side-label">Hakkında Metni (sidebar)</span>
-          <textarea id="aboutTextarea" rows="5" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.75rem;font-size:.9rem;color:var(--text);resize:vertical;outline:none;font-family:'Sora',sans-serif;margin-top:.25rem" placeholder="Kendinizi tanıtan kısa bir metin..."></textarea>
+          <textarea id="aboutText_tr" rows="4" placeholder="🇹🇷 Türkçe" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);resize:vertical;outline:none;margin-bottom:.4rem;font-family:'Sora',sans-serif"></textarea>
+          <textarea id="aboutText_en" rows="4" placeholder="🇬🇧 English" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);resize:vertical;outline:none;margin-bottom:.4rem;font-family:'Sora',sans-serif"></textarea>
+          <textarea id="aboutText_de" rows="4" placeholder="🇩🇪 Deutsch" style="width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem;font-size:.85rem;color:var(--text);resize:vertical;outline:none;font-family:'Sora',sans-serif"></textarea>
         </div>
+
         <button class="btn btn-primary" onclick="saveSettings()" style="font-size:.85rem">Tümünü Kaydet</button>
       </div>
     </div>
@@ -363,10 +377,28 @@ async function loadSettingsTab() {
   var res = await sb.from('settings').select('key, value')
   var map = {}
   ;(res.data || []).forEach(function(r) { map[r.key] = r.value })
-  document.getElementById('heroTagInput').value = map.hero_tag || ''
-  document.getElementById('heroTitleInput').value = map.hero_title || ''
-  document.getElementById('heroSubtitleInput').value = map.hero_subtitle || ''
-  document.getElementById('aboutTextarea').value = map.about_text || ''
+  var keys = ['heroTag', 'heroTitle', 'heroSubtitle', 'aboutText']
+  var dbKeys = { heroTag: 'hero_tag', heroTitle: 'hero_title', heroSubtitle: 'hero_subtitle', aboutText: 'about_text' }
+  keys.forEach(function(k) {
+    ['tr', 'en', 'de'].forEach(function(l) {
+      var el = document.getElementById(k + '_' + l)
+      if (el) el.value = map[dbKeys[k] + '_' + l] || (l === 'tr' ? (map[dbKeys[k]] || '') : '')
+    })
+  })
+}
+
+async function saveSettings() {
+  var dbKeys = { heroTag: 'hero_tag', heroTitle: 'hero_title', heroSubtitle: 'hero_subtitle', aboutText: 'about_text' }
+  var rows = []
+  Object.keys(dbKeys).forEach(function(k) {
+    ['tr', 'en', 'de'].forEach(function(l) {
+      var el = document.getElementById(k + '_' + l)
+      if (el) rows.push({ key: dbKeys[k] + '_' + l, value: el.value.trim(), updated_at: new Date().toISOString() })
+    })
+  })
+  var res = await sb.from('settings').upsert(rows)
+  if (res.error) { notify('Hata: ' + res.error.message); return }
+  notify('Kaydedildi ✓')
 }
 
 async function saveSettings() {
