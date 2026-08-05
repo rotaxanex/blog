@@ -377,9 +377,8 @@ async function loadSettingsTab() {
   var res = await sb.from('settings').select('key, value')
   var map = {}
   ;(res.data || []).forEach(function(r) { map[r.key] = r.value })
-  var keys = ['heroTag', 'heroTitle', 'heroSubtitle', 'aboutText']
   var dbKeys = { heroTag: 'hero_tag', heroTitle: 'hero_title', heroSubtitle: 'hero_subtitle', aboutText: 'about_text' }
-  keys.forEach(function(k) {
+  Object.keys(dbKeys).forEach(function(k) {
     ['tr', 'en', 'de'].forEach(function(l) {
       var el = document.getElementById(k + '_' + l)
       if (el) el.value = map[dbKeys[k] + '_' + l] || (l === 'tr' ? (map[dbKeys[k]] || '') : '')
@@ -391,11 +390,16 @@ async function saveSettings() {
   var dbKeys = { heroTag: 'hero_tag', heroTitle: 'hero_title', heroSubtitle: 'hero_subtitle', aboutText: 'about_text' }
   var rows = []
   Object.keys(dbKeys).forEach(function(k) {
-    ['tr', 'en', 'de'].forEach(function(l) {
+    var langs = ['tr', 'en', 'de']
+    langs.forEach(function(l) {
       var el = document.getElementById(k + '_' + l)
       if (el) rows.push({ key: dbKeys[k] + '_' + l, value: el.value.trim(), updated_at: new Date().toISOString() })
     })
   })
+  var res = await sb.from('settings').upsert(rows)
+  if (res.error) { notify('Hata: ' + res.error.message); return }
+  notify('Kaydedildi ✓')
+}
   var res = await sb.from('settings').upsert(rows)
   if (res.error) { notify('Hata: ' + res.error.message); return }
   notify('Kaydedildi ✓')
