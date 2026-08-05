@@ -189,6 +189,14 @@
 
         <div class="sidebar">
           <div class="side-card">
+            <span class="side-label">Yazının Dili</span>
+            <select id="postLanguage">
+              <option value="tr">🇹🇷 Türkçe</option>
+              <option value="en">🇬🇧 English</option>
+              <option value="de">🇩🇪 Deutsch</option>
+            </select>
+          </div>
+          <div class="side-card">
             <span class="side-label">Kategori</span>
             <select id="postCategory">
               <option value="">Seç...</option>
@@ -379,7 +387,8 @@ async function loadSettingsTab() {
   ;(res.data || []).forEach(function(r) { map[r.key] = r.value })
   var dbKeys = { heroTag: 'hero_tag', heroTitle: 'hero_title', heroSubtitle: 'hero_subtitle', aboutText: 'about_text' }
   Object.keys(dbKeys).forEach(function(k) {
-    ['tr', 'en', 'de'].forEach(function(l) {
+    var langs = ['tr', 'en', 'de']
+    langs.forEach(function(l) {
       var el = document.getElementById(k + '_' + l)
       if (el) el.value = map[dbKeys[k] + '_' + l] || (l === 'tr' ? (map[dbKeys[k]] || '') : '')
     })
@@ -396,22 +405,6 @@ async function saveSettings() {
       if (el) rows.push({ key: dbKeys[k] + '_' + l, value: el.value.trim(), updated_at: new Date().toISOString() })
     })
   })
-  var res = await sb.from('settings').upsert(rows)
-  if (res.error) { notify('Hata: ' + res.error.message); return }
-  notify('Kaydedildi ✓')
-}
-  var res = await sb.from('settings').upsert(rows)
-  if (res.error) { notify('Hata: ' + res.error.message); return }
-  notify('Kaydedildi ✓')
-}
-
-async function saveSettings() {
-  var rows = [
-    { key: 'hero_tag', value: document.getElementById('heroTagInput').value.trim(), updated_at: new Date().toISOString() },
-    { key: 'hero_title', value: document.getElementById('heroTitleInput').value.trim(), updated_at: new Date().toISOString() },
-    { key: 'hero_subtitle', value: document.getElementById('heroSubtitleInput').value.trim(), updated_at: new Date().toISOString() },
-    { key: 'about_text', value: document.getElementById('aboutTextarea').value.trim(), updated_at: new Date().toISOString() }
-  ]
   var res = await sb.from('settings').upsert(rows)
   if (res.error) { notify('Hata: ' + res.error.message); return }
   notify('Kaydedildi ✓')
@@ -632,6 +625,7 @@ async function savePost(status) {
   var category = document.getElementById('postCategory').value
   var cover_image = document.getElementById('coverUrl').value.trim()
   var read_time = parseInt(document.getElementById('readTime').value) || 5
+  var language = document.getElementById('postLanguage').value || 'tr'
 
   var payload = {
     title: title,
@@ -642,6 +636,7 @@ async function savePost(status) {
     tags: tags,
     featured: featured,
     read_time: read_time,
+    language: language,
     status: status,
     author_id: currentUser.id,
     published_at: status === 'published' ? new Date().toISOString() : null
@@ -673,6 +668,7 @@ async function checkEditParam() {
   document.getElementById('postTitle').value = post.title || ''
   document.getElementById('postExcerpt').value = post.excerpt || ''
   document.getElementById('postCategory').value = post.category || ''
+  document.getElementById('postLanguage').value = post.language || 'tr'
   document.getElementById('coverUrl').value = post.cover_image || ''
   document.getElementById('readTime').value = post.read_time || 5
   if (post.cover_image) previewCover(post.cover_image)
