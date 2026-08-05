@@ -721,7 +721,9 @@ function notify(msg) {
 // ── START (en sonda, her şey tanımlandıktan sonra) ──
 sb.auth.onAuthStateChange(async function(_e, session) {
   currentUser = (session && session.user) ? session.user : null
-  if (currentUser) {
+
+  if (currentUser && currentUser.id === ADMIN_USER_ID) {
+    // Admin → paneli aç
     document.getElementById('authScreen').style.display = 'none'
     document.getElementById('adminPanel').style.display = 'block'
     document.getElementById('userInfo').textContent = currentUser.email ? currentUser.email.split('@')[0] : ''
@@ -729,7 +731,11 @@ sb.auth.onAuthStateChange(async function(_e, session) {
     initEditor()
     loadAllTags()
     checkEditParam()
+  } else if (currentUser) {
+    // Normal kullanıcı → ana sayfaya ışınla
+    window.location.href = 'index.html'
   } else {
+    // Giriş yapılmamış → giriş ekranı
     document.getElementById('authScreen').style.display = 'block'
     document.getElementById('adminPanel').style.display = 'none'
   }
